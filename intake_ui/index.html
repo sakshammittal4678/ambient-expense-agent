@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Intake Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 28, 45, 0.45);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.4);
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.3);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.3);
+            --warning: #f59e0b;
+            --warning-glow: rgba(245, 158, 11, 0.3);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --input-bg: rgba(15, 23, 42, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1.5rem;
+        }
+
+        header {
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a78bfa 0%, #818cf8 50%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 350;
+        }
+
+        main {
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 2rem;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #e5e7eb;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            background: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .mode-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 0.25rem;
+            gap: 0.25rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.6rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .file-upload-box {
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.01);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-upload-box:hover {
+            border-color: var(--primary);
+            background: rgba(79, 70, 229, 0.03);
+        }
+
+        .file-upload-box svg {
+            width: 32px;
+            height: 32px;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+        }
+
+        .file-upload-box:hover svg {
+            color: #818cf8;
+        }
+
+        .file-name-display {
+            font-size: 0.85rem;
+            color: var(--success);
+            margin-top: 0.25rem;
+            font-weight: 550;
+            display: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border-left-color: white;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading .spinner {
+            display: block;
+        }
+        .loading span {
+            display: none;
+        }
+
+        /* Results pane styles */
+        .results-pane {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .placeholder-results {
+            text-align: center;
+            padding: 5rem 2rem;
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            color: var(--text-muted);
+        }
+
+        .placeholder-results svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .alert-box {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-icon {
+            font-size: 1.3rem;
+            color: var(--warning);
+            line-height: 1;
+        }
+
+        .alert-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            color: #fbbf24;
+            font-size: 0.95rem;
+        }
+
+        .alert-desc {
+            font-size: 0.85rem;
+            color: #f59e0b;
+            line-height: 1.4;
+        }
+
+        .result-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 0.75rem;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .detail-value {
+            font-weight: 550;
+            color: var(--text-main);
+            text-align: right;
+            max-width: 60%;
+            word-break: break-word;
+        }
+
+        .detail-value.highlight-amount {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .detail-value.null-value {
+            color: var(--text-muted);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .badge {
+            padding: 0.3rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge.high {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge.medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .badge.low {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Receipt Intake Portal</h1>
+        <p class="subtitle">Structured receipt processing terminal powered by Gemini Multimodal AI</p>
+    </header>
+
+    <main>
+        <section class="panel">
+            <h2 class="section-title">Expense Submission</h2>
+            
+            <form id="intake-form" onsubmit="submitForm(event)">
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label for="role">Submitter Role</label>
+                    <select id="role" required>
+                        <option value="employee">Employee</option>
+                        <option value="bookkeeper">Bookkeeper</option>
+                        <option value="owner">Owner</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="submitter-id">Submitter User ID</label>
+                    <input type="text" id="submitter-id" placeholder="e.g. alice@company.com" required value="test_user">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label>Input Mode</label>
+                    <div class="mode-tabs">
+                        <button type="button" id="tab-text" class="tab-btn active" onclick="switchMode('text')">Text</button>
+                        <button type="button" id="tab-image" class="tab-btn" onclick="switchMode('image')">Image</button>
+                        <button type="button" id="tab-audio" class="tab-btn" onclick="switchMode('audio')">Audio</button>
+                    </div>
+                </div>
+
+                <!-- Text Mode Content -->
+                <div id="content-text" class="mode-content" style="margin-bottom: 1.5rem;">
+                    <div class="form-group">
+                        <label for="text-input">Freeform Expense Text</label>
+                        <textarea id="text-input" rows="4" placeholder="Describe the expense (e.g. 'I spent ₹450 on client dinner at Taj last night')"></textarea>
+                    </div>
+                </div>
+
+                <!-- Image Mode Content -->
+                <div id="content-image" class="mode-content" style="margin-bottom: 1.5rem; display: none;">
+                    <div class="form-group">
+                        <label>Upload Receipt Photo</label>
+                        <div class="file-upload-box" onclick="document.getElementById('image-file').click()">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                            <span>Click to upload Image file (JPEG/PNG)</span>
+                            <span id="image-file-name" class="file-name-display"></span>
+                            <input type="file" id="image-file" accept="image/*" style="display: none;" onchange="handleFileChange('image')">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audio Mode Content -->
+                <div id="content-audio" class="mode-content" style="margin-bottom: 1.5rem; display: none;">
+                    <div class="form-group">
+                        <label>Upload Voice Note</label>
+                        <div class="file-upload-box" onclick="document.getElementById('audio-file').click()">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                            <span>Click to upload Audio file (MP3/WAV)</span>
+                            <span id="audio-file-name" class="file-name-display"></span>
+                            <input type="file" id="audio-file" accept="audio/*" style="display: none;" onchange="handleFileChange('audio')">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-submit" class="btn-submit">
+                    <div class="spinner"></div>
+                    <span>Submit to Intake Agent</span>
+                </button>
+            </form>
+        </section>
+
+        <section class="panel results-pane">
+            <h2 class="section-title">Structured Draft Result</h2>
+            
+            <div id="placeholder" class="placeholder-results">
+                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+                <p>Submit an expense on the left to see the structured extraction here in real-time.</p>
+            </div>
+
+            <div id="result-container" style="display: none;">
+                <!-- Workflow Outcome Banner -->
+                <div id="outcome-banner" class="alert-box" style="display: none; background: rgba(79, 70, 229, 0.15); border-color: rgba(79, 70, 229, 0.35);">
+                    <div class="alert-icon" id="outcome-icon">ℹ️</div>
+                    <div class="alert-content">
+                        <div class="alert-title" id="outcome-title" style="color: #a5b4fc;">Workflow Outcome</div>
+                        <div id="outcome-desc" class="alert-desc" style="color: #cbd5e1;"></div>
+                    </div>
+                </div>
+
+                <!-- Ambiguity Alert Banner -->
+                <div id="clarification-banner" class="alert-box" style="display: none;">
+                    <div class="alert-icon">⚠️</div>
+                    <div class="alert-content">
+                        <div class="alert-title">Clarification Required (Low Confidence)</div>
+                        <div id="clarification-reason" class="alert-desc"></div>
+                    </div>
+                </div>
+
+                <div class="result-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Numeric Amount</span>
+                        <span id="res-amount" class="detail-value highlight-amount"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Raw Amount String</span>
+                        <span id="res-raw-amount" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Vendor / Party</span>
+                        <span id="res-party" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Best Guess Category</span>
+                        <span id="res-category" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Expense Date</span>
+                        <span id="res-date" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Extraction Confidence</span>
+                        <span><span id="res-confidence" class="badge"></span></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Description Summary</span>
+                        <span id="res-description" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Submitter ID</span>
+                        <span id="res-submitter-id" class="detail-value" style="font-family: monospace;"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Submitter Role</span>
+                        <span id="res-submitter-role" class="detail-value" style="text-transform: capitalize;"></span>
+                    </div>
+                </div>
+                <button type="button" id="btn-workflow" class="btn-submit" style="margin-top: 1.5rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);" onclick="submitToWorkflow()">
+                    <div class="spinner" id="workflow-spinner"></div>
+                    <span>Submit to Expense Workflow</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let currentMode = 'text';
+        let lastParsedResult = null;
+
+        function switchMode(mode) {
+            currentMode = mode;
+            // Update tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${mode}`).classList.add('active');
+
+            // Update visible content area
+            document.querySelectorAll('.mode-content').forEach(c => c.style.display = 'none');
+            document.getElementById(`content-${mode}`).style.display = 'block';
+        }
+
+        function handleFileChange(mode) {
+            const input = document.getElementById(`${mode}-file`);
+            const display = document.getElementById(`${mode}-file-name`);
+            if (input.files && input.files[0]) {
+                display.innerText = `Selected: ${input.files[0].name}`;
+                display.style.display = 'block';
+            } else {
+                display.style.display = 'none';
+            }
+        }
+
+        async function submitForm(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit');
+            const placeholder = document.getElementById('placeholder');
+            const resultContainer = document.getElementById('result-container');
+            const clarificationBanner = document.getElementById('clarification-banner');
+            
+            btn.disabled = true;
+            btn.classList.add('loading');
+
+            const role = document.getElementById('role').value;
+            const submitterId = document.getElementById('submitter-id').value;
+
+            // Form data construction
+            const formData = new FormData();
+            formData.append('role', role);
+            formData.append('submitter_id', submitterId);
+
+            if (currentMode === 'text') {
+                const text = document.getElementById('text-input').value;
+                if (!text.trim()) {
+                    alert('Please enter some text description.');
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                    return;
+                }
+                formData.append('text_input', text);
+            } else if (currentMode === 'image') {
+                const fileInput = document.getElementById('image-file');
+                if (!fileInput.files || !fileInput.files[0]) {
+                    alert('Please select an image file to upload.');
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                    return;
+                }
+                formData.append('file', fileInput.files[0]);
+            } else if (currentMode === 'audio') {
+                const fileInput = document.getElementById('audio-file');
+                if (!fileInput.files || !fileInput.files[0]) {
+                    alert('Please select an audio file to upload.');
+                    btn.disabled = false;
+                    btn.classList.remove('loading');
+                    return;
+                }
+                formData.append('file', fileInput.files[0]);
+            }
+
+            try {
+                const response = await fetch('/api/intake', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && !result.error) {
+                    renderResult(result);
+                } else {
+                    alert('Error: ' + (result.error || 'Server error occurred'));
+                }
+            } catch (err) {
+                console.error('Request failed:', err);
+                alert('Request failed. Check console.');
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        }
+
+        function renderResult(data) {
+            lastParsedResult = data;
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('result-container').style.display = 'block';
+
+            // Amount formatting
+            const resAmount = document.getElementById('res-amount');
+            if (data.amount !== null && data.amount !== undefined) {
+                resAmount.innerText = `$${Number(data.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                resAmount.classList.remove('null-value');
+            } else {
+                resAmount.innerText = 'Null';
+                resAmount.classList.add('null-value');
+            }
+
+            document.getElementById('res-raw-amount').innerText = data.raw_amount_string || 'None';
+            
+            // Party/Vendor
+            const resParty = document.getElementById('res-party');
+            if (data.party) {
+                resParty.innerText = data.party;
+                resParty.classList.remove('null-value');
+            } else {
+                resParty.innerText = 'Null';
+                resParty.classList.add('null-value');
+            }
+
+            // Category
+            const resCategory = document.getElementById('res-category');
+            if (data.category) {
+                resCategory.innerText = data.category;
+                resCategory.classList.remove('null-value');
+            } else {
+                resCategory.innerText = 'Null';
+                resCategory.classList.add('null-value');
+            }
+
+            // Date
+            const resDate = document.getElementById('res-date');
+            if (data.date) {
+                resDate.innerText = data.date;
+                resDate.classList.remove('null-value');
+            } else {
+                resDate.innerText = 'Null';
+                resDate.classList.add('null-value');
+            }
+
+            // Description
+            document.getElementById('res-description').innerText = data.description || '';
+            document.getElementById('res-submitter-id').innerText = data.submitter_id || '';
+            document.getElementById('res-submitter-role').innerText = data.submitter_role || '';
+ 
+            // Confidence Badge
+            const confidenceBadge = document.getElementById('res-confidence');
+            confidenceBadge.innerText = data.confidence;
+            confidenceBadge.className = `badge ${data.confidence}`;
+
+            // Clarification banner display
+            const banner = document.getElementById('clarification-banner');
+            const reasonEl = document.getElementById('clarification-reason');
+            if (data.clarification_needed) {
+                reasonEl.innerText = data.clarification_reason || 'Unknown reason.';
+                banner.style.display = 'flex';
+            } else {
+                banner.style.display = 'none';
+            }
+
+            // Workflow Outcome banner display
+            const outcomeBanner = document.getElementById('outcome-banner');
+            const outcomeDesc = document.getElementById('outcome-desc');
+            const outcomeIcon = document.getElementById('outcome-icon');
+            const outcomeTitle = document.getElementById('outcome-title');
+            const btnWorkflow = document.getElementById('btn-workflow');
+            
+            if (data.outcome_message) {
+                outcomeDesc.innerText = data.outcome_message;
+                
+                if (data.outcome_message.includes('auto-approved') || data.outcome_message.includes('APPROVED')) {
+                    outcomeBanner.style.background = 'rgba(16, 185, 129, 0.15)';
+                    outcomeBanner.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+                    outcomeIcon.innerText = '✓';
+                    outcomeTitle.innerText = 'Auto-Approved';
+                    outcomeTitle.style.color = '#34d399';
+                    outcomeDesc.style.color = '#a7f3d0';
+                } else if (data.outcome_message.includes('pending') || data.outcome_message.includes('review')) {
+                    outcomeBanner.style.background = 'rgba(245, 158, 11, 0.15)';
+                    outcomeBanner.style.borderColor = 'rgba(245, 158, 11, 0.35)';
+                    outcomeIcon.innerText = '⏳';
+                    outcomeTitle.innerText = 'Pending Review';
+                    outcomeTitle.style.color = '#fbbf24';
+                    outcomeDesc.style.color = '#fde68a';
+                } else {
+                    outcomeBanner.style.background = 'rgba(79, 70, 229, 0.15)';
+                    outcomeBanner.style.borderColor = 'rgba(79, 70, 229, 0.35)';
+                    outcomeIcon.innerText = 'ℹ️';
+                    outcomeTitle.innerText = 'Submitted';
+                    outcomeTitle.style.color = '#a5b4fc';
+                    outcomeDesc.style.color = '#cbd5e1';
+                }
+                
+                outcomeBanner.style.display = 'flex';
+                if (btnWorkflow) {
+                    btnWorkflow.style.display = 'none';
+                }
+            } else {
+                outcomeBanner.style.display = 'none';
+                if (btnWorkflow) {
+                    btnWorkflow.style.display = 'flex';
+                }
+            }
+        }
+
+        async function submitToWorkflow() {
+            if (!lastParsedResult) return;
+            const btn = document.getElementById('btn-workflow');
+            
+            btn.disabled = true;
+            btn.classList.add('loading');
+            
+            const payload = {
+                amount: lastParsedResult.amount || 0.0,
+                submitter: lastParsedResult.submitter_id || "Unknown",
+                category: lastParsedResult.category || "General",
+                description: lastParsedResult.description || "",
+                date: lastParsedResult.date || ""
+            };
+            
+            try {
+                const response = await fetch('/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const resData = await response.json();
+                if (response.ok) {
+                    alert('Successfully submitted to Expense Approval Workflow! Status: ' + resData.status + ', Decision: ' + resData.decision);
+                } else {
+                    alert('Error submitting to workflow: ' + (resData.message || 'Unknown error'));
+                }
+            } catch (err) {
+                console.error('Workflow submission failed:', err);
+                alert('Submission failed. Check console.');
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        }
+    </script>
+</body>
+</html>
